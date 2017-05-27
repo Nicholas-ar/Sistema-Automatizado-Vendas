@@ -13,4 +13,4 @@ imediatamente. O gerente precisa de um meio para cadastrar as vendas de todos os
 - Mostrar o número do mês com mais vendas;
 - Finalizar o programa;
 # Desenvolvimento:
-Criado em C, para ser utilizado em SO Linux, por [Karen Gomes](https://github.com/karenngomes) e [Nicholas Araújo](https://github.com/Nicholas-ar/).
+Criado em C, com versões diferentes para sistemas operacionais diferentes por [Karen Gomes](https://github.com/karenngomes) e [Nicholas Araújo](https://github.com/Nicholas-ar/).
