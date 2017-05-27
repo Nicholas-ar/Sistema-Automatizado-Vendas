@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #define mV 10
-#define meses 12
-typedef float** MatrizVendas;
-typedef struct 
+
+typedef struct
 {
 	int idVendedor, mesVenda;
 	float valorVenda;
@@ -13,13 +12,13 @@ typedef struct
 void cadastrarVendedor(){
 	//Cadastra um vendedor, através de um número, sua ID, até um máximo de 10 vendedores
 	FILE *arquivo;
-    int j = 0, count = 0, pausa = 0, codigoVendedor = 0;
-    int status = 1;
-    float codigoVendedorTemp = 0;
-    
-	arquivo = fopen("vendedores.txt","a+");
+    arquivo = fopen("vendedores.txt","a+");
 
-	if(arquivo == NULL){
+    int j = 0, count = 0, pausa = 0, codigoVendedor = 0, status = 1;
+    float codigoVendedorTemp = 0;
+
+	if(arquivo == NULL)
+	{
 		printf("Arquivo nao pode ser aberto \n\n");
 		system("pause");
 	}
@@ -30,28 +29,28 @@ void cadastrarVendedor(){
 	system("clear");
 
 	while((!feof(arquivo)))
+	{
+		fscanf(arquivo,"%d", &j);
+		if(count >= mV)
 		{
-			fscanf(arquivo,"%d",&j);
-			if(count>=mV)
-			{
-				printf("Limite atingido.\n\n");
-				pausa=1;
-				break;
-			}
-			count++;
-			if(codigoVendedor==j)
-			{
-				printf("Esse codigo ja esta sendo utilizado por outro vendedor,ignorando comando\n\n");
-				pausa=1;
-				break;
-			}
+			printf("Limite atingido.\n\n");
+			pausa = 1;
+			break;
 		}
-	
+		count++;
+		if(codigoVendedor == j)
+		{
+			printf("Esse codigo ja esta sendo utilizado por outro vendedor,voltando ao menu.\n\n");
+			pausa = 1;
+			break;
+		}
+	}
+
 	if(!pausa)
 	{
-		
+
 		fprintf(arquivo, "%d\n",codigoVendedor);
-		printf("Vendedor Registrado com sucesso \n\n");
+		printf("Vendedor Registrado com sucesso!\n\n");
 		count++;
 	}
 
@@ -66,7 +65,8 @@ void cadastrarVenda(){
 	arquivo = fopen("vendas.txt","a+");
 	arqvenda = fopen("vendedores.txt","r");
 
-    int j = 0, existe=0;
+    int j = 0, existe = 0;
+
 	Vendas v;
 
 	printf("Informe o codigo do vendedor: ");
@@ -79,28 +79,31 @@ void cadastrarVenda(){
 	scanf("%f",&v.valorVenda);
 
 	while((!feof(arqvenda)))
+	{
+		fscanf(arqvenda,"%d",&j);
+
+		if(v.idVendedor==j)
 		{
-			fscanf(arqvenda,"%d",&j);
-			
-			if(v.idVendedor==j)
-			{
-				existe=1;
-				break;
-			}			
+			existe=1;
+			break;
 		}
+	}
+
 	system("clear");
-	if(existe){
-		if(v.mesVenda<1 || v.mesVenda>12){
-			printf("Mes Invalido\n");
+
+	if(existe)
+	{
+		if(v.mesVenda < 1 || v.mesVenda > 12){
+			printf("Mes Invalido, voltando ao menu principal.\n");
 		}
 		else{
 		fprintf(arquivo, "%d\n%d\n%.2f\n", v.idVendedor, v.mesVenda, v.valorVenda);
 		}
 	}
 	else{
-		printf("Vendedor nao existe. Comando ignorado\n\n");
+		printf("Vendedor nao existe, voltando ao menu principal.\n\n");
 	}
-		
+
 	fclose(arquivo);
 	fclose(arqvenda);
 }
@@ -109,7 +112,7 @@ void consultarVendas(){
 	//Consulta as vendas realizadas por um vendedor em determinado mês
 	FILE *arquivo;
 	arquivo = fopen("vendas.txt","r");
-	
+
     int codigoVendedor, idTemp, mesAux, mes, existe = 0;
     float totalVendames = 0, valorTemp;
 
@@ -120,25 +123,24 @@ void consultarVendas(){
     scanf("%d",&mes);
 
     while(1)
+	{
+		fscanf(arquivo,"%d %d %f",&idTemp, &mesAux, &valorTemp);
+		/*fscanf(arquivo,"%d",&mesAux);
+		fscanf(arquivo,"%f",&valorTemp);*/
+		if(feof(arquivo)) break;
+		if(codigoVendedor==idTemp && mesAux==mes)
 		{
-			fscanf(arquivo,"%d %d %f",&idTemp, &mesAux, &valorTemp);
-			/*fscanf(arquivo,"%d",&mesAux);
-			fscanf(arquivo,"%f",&valorTemp);*/
-			if(feof(arquivo)) break;
-			if(codigoVendedor==idTemp && mesAux==mes)
-			{
-				totalVendames+=valorTemp;
-				existe=1;
-			}			
+			totalVendames+=valorTemp;
+			existe=1;
 		}
-	
-	system("clear");
-	if(existe){
-		printf("O Valor Vendido nesse mes pelo vendedor %d foi R$ %.2f\n\n", codigoVendedor, totalVendames);
 	}
+
+	system("clear");
+	if(existe)
+		printf("O Valor Vendido nesse mes pelo vendedor %d foi R$ %.2f\n\n", codigoVendedor, totalVendames);
 	else
-		printf("Valor inexistente\n");
-	
+		printf("Valor inexistente, voltando ao menu principal.\n");
+
 
 }
 
@@ -146,7 +148,7 @@ void consultarTotal(){
 	//Consulta todas as vendas realizadas por um vendedor
 	FILE *arquivo;
 	arquivo = fopen("vendas.txt","r");
-	
+
     int codigoVendedor, idTemp, mesTemp, existe = 0;
     float valorTemp, total = 0;
 
@@ -154,21 +156,23 @@ void consultarTotal(){
     scanf("%d",&codigoVendedor);
 
     while(1)
+	{
+		fscanf(arquivo,"%d %d %f",&idTemp, &mesTemp, &valorTemp);
+		if(feof(arquivo)) break;
+		if(codigoVendedor==idTemp)
 		{
-			fscanf(arquivo,"%d %d %f",&idTemp, &mesTemp, &valorTemp);
-			if(feof(arquivo)) break;
-			if(codigoVendedor==idTemp)
-			{
-				total+=valorTemp;
-				existe=1;
-			}			
+			total+=valorTemp;
+			existe=1;
 		}
+	}
+
 	system("clear");
+
 	if(existe){
-		printf("Total de Vendas do Vendedor %d: R$ %.2f \n\n", codigoVendedor, total);	
+		printf("Total de Vendas do Vendedor %d: R$ %.2f \n\n", codigoVendedor, total);
 	}
 	else{
-		printf("Valor inexistente\n");
+		printf("Valor inexistente, voltando ao menu principal.\n");
 	}
 
 }
@@ -181,74 +185,54 @@ void consultarMelhorVendedor(){
 	arqvenda = fopen("vendedores.txt","r");
 
     float valorVenda = 0, vendasTemp = 0, valorTemp = 0, melhorVendas = 0;
-    int mesTemp, idTemp, melhorVendedor;//idAux[10],
-    int mes,i;
+    int mesTemp, idTemp, melhorVendedor, mes, i;
     int *idAux = malloc (10 * sizeof (int));
-    /*
-    MatrizVendas V = (MatrizVendas)calloc(mV,sizeof(float*));
-
-    if (V == NULL)
-	{
-		puts("Erro aloc. matriz");
-		exit(0);
-	}
-	for (i=0; i<mV; i++)
-	{
-		/* Para cada componente de V, aloca-se meses colunas*/
-		/*V[i] = (float*)calloc(meses, sizeof(float));
-		if (V[i]==NULL)
-		{
-			puts("Erro aloc. matriz");
-			exit(0);
-		}
-	}*/
-
 
     printf("Informe o mes de venda: ");
     scanf("%d",&mes);
 
     system("clear");
 
-    	for(i=0;1;i++)
+    	for(i = 0;1;i++)
 		{
-			fscanf(arqvenda,"%d",&idAux[i]);
+			fscanf(arqvenda,"%d", &idAux[i]);
 
 			if(feof(arqvenda)) break;
 		}
-		for(i=0;i<mV;i++)
+		for(i = 0;i < mV;i++)
 		{
 		    arquivo = fopen("vendas.txt","r");
-			vendasTemp=0;
-			while(1){
-			fscanf(arquivo,"%d",&idTemp);
-			fscanf(arquivo,"%d",&mesTemp);
-			fscanf(arquivo,"%f",&valorTemp);
-			if(feof(arquivo))
+			vendasTemp = 0;
+			while(1)
 			{
-			    fclose(arquivo);
-                break;
-			}
-            //printf("\n%d %d %d %.2f\n\n",idAux[i],idTemp,mesTemp,valorTemp);
-
-			if(mesTemp==mes)
+				fscanf(arquivo,"%d", &idTemp);
+				fscanf(arquivo,"%d", &mesTemp);
+				fscanf(arquivo,"%f", &valorTemp);
+				if(feof(arquivo))
 				{
-					if(idAux[i]==idTemp)
-					{
-						vendasTemp+=valorTemp;
-						//printf("%.2f\n", vendasTemp);
-					}
-
+				    fclose(arquivo);
+	                break;
 				}
 
-			if(vendasTemp>melhorVendas)
-			{
-				melhorVendas=vendasTemp;
-				melhorVendedor=idTemp;
-			}
+				if(mesTemp == mes)
+				{
+					if(idAux[i] == idTemp)
+						vendasTemp+=valorTemp;
+				}
+
+				if(vendasTemp > melhorVendas)
+				{
+					melhorVendas = vendasTemp;
+					melhorVendedor = idTemp;
+				}
 			}
 		}
-
-  	printf("O vendedor com mais vendas durante o mes foi o vendedor (%d) com R$ %.2f vendidos\n\n",melhorVendedor,melhorVendas);
+    if(melhorVendas < 0.05)
+    {
+        printf("Nenhuma venda realizada no mes.\n\n");
+    }
+    else
+  	printf("O vendedor com mais vendas durante o mes foi o vendedor (%d) com R$ %.2f vendidos\n\n", melhorVendedor, melhorVendas);
 }
 
 void consultarMelhorMes(){
@@ -259,75 +243,97 @@ void consultarMelhorMes(){
 	int id, mes, melhorMes, i;
 	float soma[13] = {0}, maior, valor;
 
-		while(1)
-		{
-			fscanf(arquivo,"%d %d %f",&id, &mes, &valor);
-		
-			if(feof(arquivo)) break;
-			soma[mes]+=valor;			
-		}
-		for(i = 1;i < 13;i++)
-		{
-			if(soma[i] > maior)
-				{
-					melhorMes = i;
-					maior = soma[i];
-				}
-		}
-	
-	system("clear");
-  	
-  	printf("O mes com a maior quantidade de vendas foi: %d, com R$ %.2f em vendas.\n\n", melhorMes, maior);
-}
+	while(1)
+	{
+		fscanf(arquivo,"%d %d %f",&id, &mes, &valor);
 
+		if(feof(arquivo)) break;
+		soma[mes]+=valor;
+	}
+
+	for(i = 1;i < 13;i++)
+	{
+		if(soma[i] > maior)
+		{
+			melhorMes = i;
+			maior = soma[i];
+		}
+	}
+
+	system("clear");
+    if(maior<0.05)
+    {
+        printf("Nenhuma venda cadastrada, voltando ao menu.\n\n");
+    }
+    else
+    {
+        printf("O mes com a maior quantidade de vendas foi: %d, com R$ %.2f em vendas.\n\n", melhorMes, maior);
+    }
+
+}
+void MudarNome(char *nome){
+	printf("Digite seu nome: ");
+	scanf("\n%[^\n]", nome);
+	system("clear");
+}
 int main(){
-    
+
 	int op = 0;
 	int sair = 0;
-	
+	char nome[50] = "User";
 	system("clear");
-	
-	while(sair != 1){		
-		
-		printf("---------------------------- MENU PRINCIPAL --------------------------\n");
-		printf("(1) Cadastrar Vendedor\n");
-		printf("(2) Cadastrar Venda\n");
-		printf("(3) Consultar as vendas de um vendedor em um determinado mês\n");
-		printf("(4) Consultar o total das vendas de um determinado vendedor\n");
-		printf("(5) Mostrar o numero do vendedor que mais vendeu em um determinado mes\n");
-		printf("(6) Mostrar o numero do mes com mais vendas\n");
-		printf("(7) Finalizar o programa\n\n");
-		printf("Informe a opcao desejada: ");
+
+	while(sair != 1){
+
+		printf("|------------------------------- MENU PRINCIPAL ------------------------------|\n");
+		printf("|  Bem vindo %s!                                                              \n",nome);
+		printf("|-----------------------------------------------------------------------------|\n");
+		printf("|    (1) Cadastrar Vendedor                                                   |\n");
+		printf("|    (2) Cadastrar Venda                                                      |\n");
+		printf("|    (3) Consultar as vendas de um vendedor em um determinado mes.            |\n");
+		printf("|    (4) Consultar o total das vendas de um determinado vendedor.             |\n");
+		printf("|    (5) Mostrar o numero do vendedor que mais vendeu em um determinado mes.  |\n");
+		printf("|    (6) Mostrar o numero do mes com mais vendas.                             |\n");
+		printf("|    (7) Mudar o nome.                                                        |\n");
+		printf("|    (8) Finalizar o programa.                                                |\n");
+		printf("|-----------------------------------------------------------------------------|\n");
+		printf("\nInforme a opcao desejada: ");
 		scanf ("%d",&op);
-		
+
 		switch(op){
 				case 1:
 					cadastrarVendedor();
-				break;
+					break;
 
 				case 2:
 					cadastrarVenda();
-				break;
-				
+					break;
+
 				case 3:
 					consultarVendas();
-				break;
-				
-				case 4:	
+					break;
+
+				case 4:
 					consultarTotal();
-				break;
+					break;
 
 				case 5:
 					consultarMelhorVendedor();
-				break;
-				
+					break;
+
 				case 6:
 					consultarMelhorMes();
-				break;
-				
+					break;
+
 				case 7:
+					MudarNome(nome);
+					system("clear");
+					break;
+
+				case 8:
 					sair = 1;
-					break;	
+					break;
 			}
 	}
 }
+
